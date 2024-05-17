@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File List</title>
+</head>
+<body>
+    <h1> 업로드 파일 목록 </h1>
+    <ul>
+    {% for file in list %}
+        <li>
+            {{file.Name}} <a href = "/media/{{file.file}}"> {{ file.file }} 
+            <a href = "{% url 'file_upload:remove' file.id %}"> <button>삭제</button></a>
+        </li>
+    {% endfor %}
+</body>
+</html>
