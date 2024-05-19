@@ -11,8 +11,8 @@
 
 ![백엔드 프로세스](https://github.com/9unu/Itsme_web/assets/124652096/a0ca17d9-f27c-4421-86e8-0b46f1766703)
 
-`활용한 정중체, 상냥체 모델 정보`
+## 활용한 정중체, 상냥체 모델 정보
 
-정중체 변환기 : https://huggingface.co/9unu/gentle_speech_translation
+`정중체 변환기` : https://huggingface.co/9unu/gentle_speech_translation
 
-상냥체 변환기 : https://huggingface.co/9unu/formal_speech_translation
+`상냥체 변환기` : https://huggingface.co/9unu/formal_speech_translation
