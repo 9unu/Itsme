@@ -21,17 +21,17 @@ class hugging():
     
 # 파이프라인 실행 -> 변환 문장 return
 def make_pipeline(model, tokenizer, device):
-    nlg_pipeline = pipeline('text2text-generation', model=model, tokenizer=tokenizer, device=device, max_length=60) # "auto" -> 자동으로 분산
+    nlg_pipeline = pipeline('text2text-generation', model=model, tokenizer=tokenizer, device=device) # "auto" -> 자동으로 분산
     return nlg_pipeline
     
-# def generate_text(pipe, text, target_style, num_return_sequences=1, max_length=60):
-#     style_map = {
-#                 'user' : '사용자',
-#                 'formal': '상냥체',
-#                 'gentle' : '정중체',
-#                 'random' : '이상한'
-#                 }
-#     target_style_name = style_map[target_style]
-#     text = f"{target_style_name} 말투로 변환:{text}"
-#     out = pipe(text, num_return_sequences=num_return_sequences, max_length=max_length)
-#     return [x['generated_text'] for x in out]
+def generate_text(pipe, text, target_style, num_return_sequences=1, max_length=60):
+    style_map = {
+                'user' : '사용자',
+                'formal': '상냥체',
+                'gentle' : '정중체',
+                'random' : '이상한'
+                }
+    target_style_name = style_map[target_style]
+    text = f"{target_style_name} 말투로 변환:{text}"
+    out = pipe(text, num_return_sequences=num_return_sequences, max_length=max_length)
+    return [x['generated_text'] for x in out]

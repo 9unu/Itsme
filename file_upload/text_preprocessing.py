@@ -20,7 +20,6 @@ def txt_process(lines, user_name):
     past_pattern = r"(\d{4}년 \d{1,2}월 \d{1,2}일) (오후|오전) (\d{1,2}:\d{2}), (.*?) :"
     now_pattern = r"\[(.*?)\] \[(오전|오후) (\d{1,2}:\d{2})\]"
     match = re.search(past_pattern, str(df['text'].iloc[10]))
-    df['user']=""
     if match:
         pattern = past_pattern
         for index, message in df['text'].items():
@@ -104,11 +103,10 @@ def txt_to_csv(file, user_name):
         # 프로세서 1 : 0~ each_chunk_length*1
         # 프로세서 2 : each_chunk_length*1~ each_chunk_length*2
         chunk_list = []
-        for num in range(chunk_num-1):
+        for num in range(chunk_num):
             chunk_list.append(lines[each_chunk_length * num:each_chunk_length * (num + 1)])
-        if len(lines) % chunk_num != 0:
-            chunk_list.append(lines[each_chunk_length*chunk_num:])
-        pool = mp.Pool(processes=len(chunk_list))
+
+        pool = mp.Pool(processes=chunk_num)
         dfs = pool.starmap(txt_process, [(chunk, user_name) for chunk in chunk_list])
         pool.close()
         pool.join()
@@ -117,10 +115,11 @@ def txt_to_csv(file, user_name):
         df = pd.concat([df for df, _ in dfs], ignore_index=True)
         users = list(set([user for _, user_list in dfs for user in user_list]))
         
+        # 예전 카카오톡 txt파일 문장 스타트 포맷 <-> 현재 카카오톡 txt파일 문장 스타트 포맷
         """ 단체방 유무 확인 """
         group = len(users) > 2
 
-        return room_name, df, group, str(users)
+        return room_name, df, group, ", ".join(users)
 
 """
 target 문체 하나와 다른 문체들을 1:1 매칭한 데이터 프레임 생성
