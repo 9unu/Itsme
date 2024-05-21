@@ -77,7 +77,7 @@ def user_modeling(df, hug_obj):
                     gradient_accumulation_steps=2,
                     weight_decay=0.01,
                     save_total_limit=1,
-                    num_train_epochs=30,
+                    num_train_epochs=10,
                     predict_with_generate=True,
                     fp16=False,
             )
@@ -88,7 +88,7 @@ def user_modeling(df, hug_obj):
         data_collator=data_collator,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,
-        callbacks = [EarlyStoppingCallback(early_stopping_patience=5)]
+        callbacks = [EarlyStoppingCallback(early_stopping_patience=2)]
     )
 
     # 모델 학습

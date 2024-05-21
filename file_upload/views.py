@@ -72,8 +72,7 @@ def upload(request):
             df['formal'] = None
             df['gentle'] = None
             print("총 데이터 수:", len(df))
-            df=df.iloc[:10]
-            limit = min(1500, len(df))
+            limit = min(1000, len(df))
             df = df.sample(n=limit)
             print("학습용 데이터 수 (최대 1500 제한):", len(df))
             print("<<<학습 데이터 생성 파이프라인 동작 중>>>")
@@ -86,7 +85,7 @@ def upload(request):
             end_time = time.time()
             elapsed_time = end_time - start_time
             print(f"<<<학습 데이터 생성 완료>>> {elapsed_time // 60} 분")
-            df.to_csv("학습 데이터 확인용.csv", encoding='utf-8')
+            # df.to_csv("학습 데이터 확인용.csv", encoding='utf-8')
             total_time+=elapsed_time
             # process_1이 완료되었으므로 그 결과를 process_2에 넘겨줌
             print("<<<모델 학습 코드 동작 중>>>")
@@ -102,7 +101,7 @@ def upload(request):
 
             instance.reply_list = result
             instance.save()
-            print("총 소요 시간: ", total_time)
+            print("총 소요 시간: ", total_time//60 ,"분")
             return redirect(reverse('file_upload:index'))
     else:
         form = UploadFileForm()
@@ -136,3 +135,18 @@ def delete_file(request, id):
     file.delete() # db값 삭제 (media값삭제 아님)
 
     return redirect(reverse('file_upload:list'))
+
+
+from rest_framework import viewsets
+from .serializers import PostSerializer
+from .models import UploadFile
+
+class ResponseViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user_id = self.request.headers.get('user-id')
+        print(type(user_id))
+        queryset = UploadFile.objects.filter(id=int(user_id))
+
+        return queryset

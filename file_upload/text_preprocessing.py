@@ -83,7 +83,7 @@ def txt_to_csv(file, user_name):
     if(len(lines)<30000):
         df, users = txt_process(lines, user_name)
         group = len(users) > 2
-        return room_name, df, group, ", ".join(users)
+        return room_name, df, group, str(users)
 
     else:
         """과거 텍스트 파일 여부 확인"""
