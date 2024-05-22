@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-wdf5sz^z*&p@padke-9g1b-(o#xddc0=o@*8sqm*o)+uulon4d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.2.2','127.0.0.1']
+ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1']
 
 
 # Application definition
@@ -39,7 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'file_upload.apps.FileUploadConfig',
     'rest_framework',
-
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +54,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware'
 ]
 
 ROOT_URLCONF = 'itsme.urls'
@@ -57,7 +63,7 @@ ROOT_URLCONF = 'itsme.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],  # 템플릿 디렉토리 설정
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,10 +86,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'itsme_db',
-        'USER':'root',
-        'PASSWORD':'5994',
-        'HOST':'localhost',
-        'PORT':''
+        'USER' : 'root',
+        'PASSWORD' : '5994',
+        'HOST' : 'localhost',
+        'PORT':'',
     }
 }
 
@@ -133,6 +139,29 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # 업로드 된 파일에 대한 요청
-MEDIA_URL='/media/'
-import   os
-MEDIA_ROOT = os.path.join(BASE_DIR,'media') # 현재 프로젝트 폴더 (PRIOR)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# django-allauth 설정
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1  # django.contrib.sites 를 사용할 때 필요합니다.
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+LOGIN_REDIRECT_URL = 'file_upload:kakao'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'file_upload:user_login'
+ACCOUNT_LOGOUT_ON_GET = True
+
+SOCIALACCOUNT_PROVIDERS = {
+    'kakao': {
+        'APP': {
+            'client_id': '0a28205ab1a5a548bcd4153810261b76',
+            'secret': '',
+            'key': ''
+        }
+    }
+}
