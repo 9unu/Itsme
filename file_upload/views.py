@@ -11,7 +11,7 @@ import time
 from .user_speech_modeling import user_modeling
 from .hug import hugging, make_pipeline
 import pandas as pd
-
+base_url="http://127.0.0.1:8000"
 
 # 정중체, 상냥체 모델로 학습데이터 생성
 def process_1(queue1, df, hug_obj):
@@ -50,22 +50,37 @@ def process_2(queue2, df, hug_obj):
 
     queue2.put(str(result))
 
+from django.contrib.auth.decorators import login_required
+@login_required # 로그인 상태일때만 가능
 def upload(request):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             total_time=0
             hug_obj = hugging()
-            mp.set_start_method('spawn')
+            # mp.set_start_method('spawn')
             instance = form.save(commit=False)
+            instance.user_name=request.session['user_name']
+            instance.user_id=request.session['user_id']
             print("<<<카톡 데이터 csv로 변환 중>>>")
             start_time = time.time()
-            room_name, df, group, users = txt.txt_to_csv(instance.file, instance.name)
+            room_name, df, group, users = txt.txt_to_csv(instance.file, instance.user_name)
+            instance.room = room_name
             end_time = time.time()
             elapsed_time = end_time - start_time
             print(f"<<<변환 완료>>>{elapsed_time} 초")
+            ExistingInstance = UploadFile.objects.filter(user_id=instance.user_id, room=instance.room)
+            if ExistingInstance.exists():
+                for file in ExistingInstance:
+                    media_root = str(settings.MEDIA_ROOT)  # Path 객체를 문자열로 변환
+                    remove_file = os.path.join(media_root, str(file.file))
+                    # 파일이 존재하면 삭제
+                    if os.path.isfile(remove_file):
+                        os.remove(remove_file)  # 실제 파일 삭제
+                    
+                    file.delete()
+            
             total_time+=elapsed_time
-            instance.room = room_name
             instance.group = group
             instance.users = users
             df.columns = ['user']
@@ -85,7 +100,6 @@ def upload(request):
             end_time = time.time()
             elapsed_time = end_time - start_time
             print(f"<<<학습 데이터 생성 완료>>> {elapsed_time // 60} 분")
-            # df.to_csv("학습 데이터 확인용.csv", encoding='utf-8')
             total_time+=elapsed_time
             # process_1이 완료되었으므로 그 결과를 process_2에 넘겨줌
             print("<<<모델 학습 코드 동작 중>>>")
@@ -109,34 +123,97 @@ def upload(request):
     return render(request, 'file_upload/upload_form.html', {'form': form})
 
 
+from django.views import View
+import requests
+"""카카오 서버에 인증 요청"""
+class kakaoView(View):
+    def get(self, request):
+        kakao_api = "http://kauth.kakao.com/oauth/authorize?response_type=code"
+        redirect_uri = f"{base_url}/file/kakao/callback"
+        client_id = "0a28205ab1a5a548bcd4153810261b76"
+        
+        return redirect(f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}")
+    
+"""인증 요청 후 받은 엑세스토큰으로 사용자 정보 get request -> nickname, id 수집"""
+class kakaoCallBackView(View):
+    def get(self, request):
+        data={
+            "grant_type" : "authorization_code",
+            "client_id" : "0a28205ab1a5a548bcd4153810261b76",
+            "redirection_uri": f"{base_url}/file/kakao",
+            "code" : request.GET["code"]
+        }
+        kakao_token_api="https://kauth.kakao.com/oauth/token"
+        access_token = requests.post(kakao_token_api, data=data).json()["access_token"]
+        
+        kakao_user_api="https://kapi.kakao.com/v2/user/me"
+        header = {"Authorization":f"Bearer ${access_token}"}
+        user_information = requests.get(kakao_user_api, headers=header).json()
+        
+        kakao_id=user_information["id"]
+        # kakao_email=user_information["kakao_account"]["email"]
+        # profile_image_url=user_information["properties"]["profile_image"]
+        kakao_nickname = user_information["properties"]["nickname"]
+        request.session['user_id']=kakao_id
+        request.session['user_name']=kakao_nickname
+        return render(request, 'file_upload/index.html')
+        
+
+"""로그인 화면"""
+def user_login(request):
+    return render(request, 'file_upload/user_login.html')
+
+"""초기 화면"""
+def index(request):
+    return render(request, 'file_upload/index.html')
+
+
+"""업로드한 파일 보여주는 화면"""
 def file_list(request):
-    list = UploadFile.objects.all().order_by('-pk')# '-pk' ->역정렬 (최신이 위로 가게)
+    list = UploadFile.objects.filter(user_id=request.session['user_id']).order_by('-pk')# '-pk' ->역정렬 (최신이 위로 가게)
     return render(
         request,
         'file_upload/file_list.html',
         {'list':list}
     )
 
-def index(request):
-    return render(request, 'file_upload/index.html')
-
-
+"""업로드한 파일 중 삭제하고 싶은 파일 선택시 제거"""
 import os
 from django.conf import settings
 def delete_file(request, id):
-    file=UploadFile.objects.get(pk=id)
-    media_root=settings.MEDIA_ROOT
-    remove_file = media_root + '/' + str(file.file)
-    print("삭제할 파일:", remove_file)
-
-    if os.path.isfile(remove_file):
-        os.remove(remove_file) # 실제 파일 삭제
-
-    file.delete() # db값 삭제 (media값삭제 아님)
-
+    try:
+        # user_id와 pk로 파일을 가져옴
+        file = UploadFile.objects.filter(user_id=request.session['user_id']).get(pk=id)
+        
+        # 파일 경로를 생성
+        media_root = str(settings.MEDIA_ROOT)  # Path 객체를 문자열로 변환
+        remove_file = os.path.join(media_root, str(file.file))
+        print("삭제할 파일:", remove_file)
+        
+        # 파일이 존재하면 삭제
+        if os.path.isfile(remove_file):
+            os.remove(remove_file)  # 실제 파일 삭제
+        
+        # 데이터베이스에서 파일 레코드 삭제
+        file.delete()  # db값 삭제 (media값 삭제 아님)
+        
+    except UploadFile.DoesNotExist:
+        print("파일이 존재하지 않습니다.")
+    
+    # 파일 목록 페이지로 리다이렉트
     return redirect(reverse('file_upload:list'))
 
+"""로그 아웃 시 세션에 묶여있던 사용자 id, 닉네임 메모리 제거"""
+def del_session(request):
+    if 'user_id' in request.session:
+        del request.session['user_id']
+    if 'user_name' in request.session:
+        del request.session['user_name']
+    
+    return render(request, 'file_upload/user_login.html')
+    
 
+"""모바일 앱에서 request왔을 때 header 내용 (user-id)에 맞춰서 필터링 후 사용자의 답장 리스트 response"""
 from rest_framework import viewsets
 from .serializers import PostSerializer
 from .models import UploadFile
@@ -146,7 +223,5 @@ class ResponseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_id = self.request.headers.get('user-id')
-        print(type(user_id))
-        queryset = UploadFile.objects.filter(id=int(user_id))
-
+        queryset = UploadFile.objects.filter(user_id=user_id)
         return queryset

@@ -9,7 +9,13 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p}}
-        <button type = "submit"> 업로드</button>
+        <button type="submit"> 업로드</button>
+    </form>
+    <form id="logout-form" method="post" action="{% url 'file_upload:del_session' %}">
+        {% csrf_token %}
+        {% if user.is_authenticated %}
+            <button type="submit">로그아웃</button>
+        {% endif %}
     </form>
 </body>
 </html>

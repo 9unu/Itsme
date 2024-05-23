@@ -18,7 +18,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('file/', include('file_upload.urls'))
+    path('file/', include('file_upload.urls')),
+    path('accounts/', include('allauth.urls')),
 ]
 
 from django.conf import settings
