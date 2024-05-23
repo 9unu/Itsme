@@ -4,7 +4,7 @@
 ### 웹페이지 화면
 
 ### 변환 전
-![GIFMaker_me](https://github.com/9unu/Itsme_web/assets/124652096/12bd097f-5980-437e-a4bc-c88f3b6fa43b)
+![변환전](https://github.com/9unu/Itsme_web/assets/124652096/6b83f28a-bcf0-4913-8db8-78b33a24ed00)
 
 ### 변환 후
 ![GIFMaker_me (1)](https://github.com/9unu/Itsme_web/assets/124652096/e112ff67-1645-427b-8fdd-ddb69023952c)
