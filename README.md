@@ -2,13 +2,13 @@
 : 스마트워치에서의 무뚝뚝한 답장 대신, 사용자의 대화 상대별 말투를 학습하여, 답장을 제안하는 프로젝트
 ## 데모 영상
 ### 웹페이지 화면
+![장고](https://github.com/9unu/Itsme_web/assets/124652096/423f82f1-f2b8-4b46-9521-84965887d987)
 
 ### 변환 전
 ![변환전](https://github.com/9unu/Itsme_web/assets/124652096/6b83f28a-bcf0-4913-8db8-78b33a24ed00)
 
 ### 변환 후
 ![GIFMaker_me (1)](https://github.com/9unu/Itsme_web/assets/124652096/e112ff67-1645-427b-8fdd-ddb69023952c)
-
 
 ## 백엔드 플로우 차트 (Django)
 ![백엔드 플로우 차트](https://github.com/9unu/Itsme_web/assets/124652096/7364cfe0-dba3-477e-ad2f-0d6768409379)
