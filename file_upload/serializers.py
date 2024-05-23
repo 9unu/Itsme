@@ -4,4 +4,4 @@ from .models import UploadFile
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = UploadFile
-        fields = ('name', 'room', 'users', 'group', 'reply_list')
+        fields = ('user_id', 'user_name', 'room', 'reply_list')

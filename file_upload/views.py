@@ -11,6 +11,7 @@ import time
 from .user_speech_modeling import user_modeling
 from .hug import hugging, make_pipeline
 from django.conf import settings
+import pandas as pd
 
 home_url="http://127.0.0.1:8000"
 
@@ -36,6 +37,7 @@ def process_1(queue1, df, hug_obj):
     df['formal']=formal_outputs
     df['gentle']=gentle_outputs
     queue1.put(df)
+
     
 # 사용자 말투 학습 + 답장 리스트 생성
 def process_2(queue2, df, hug_obj):
@@ -77,10 +79,8 @@ def upload(request):
                     remove_file = os.path.join(media_root, str(file.file))
                     # 파일이 존재하면 삭제
                     if os.path.isfile(remove_file):
-                        os.remove(remove_file)  # 실제 파일 삭제
-                    
-                    file.delete()
-            
+                        os.remove(remove_file)  # 실제 파일 삭제                    
+                    file.delete()           
             total_time+=elapsed_time
             instance.group = group
             instance.users = users
@@ -224,5 +224,51 @@ class ResponseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_id = self.request.headers.get('user-id')
+        print(user_id)
         queryset = UploadFile.objects.filter(user_id=user_id)
+        print(queryset)
         return queryset
+    
+
+
+"""여러개 gpu활용가능할때 병렬처리용"""
+# def formal_change(queue1, df, hug_obj):
+#     formal_pipeline = make_pipeline(model=hug_obj.formal_model, tokenizer=hug_obj.tokenizer, device=hug_obj.device)    
+#     formal_outputs=[]
+#     def data_load():
+#         for row in df['user']:
+#             yield str("상냥체 말투로 변환:" + row).strip()
+
+#     for out in formal_pipeline(data_load()):
+#         formal_outputs.append([x['generated_text'] for x in out])
+#     queue1.put(formal_outputs)
+
+# def gentle_change(queue2, df, hug_obj):
+#     gentle_pipeline = make_pipeline(model=hug_obj.gentle_model, tokenizer=hug_obj.tokenizer, device=hug_obj.device)
+#     gentle_outputs=[]
+#     def data_load():
+#         for row in df['user']:
+#             yield str("정중체 말투로 변환:" + row).strip()
+#     for out in gentle_pipeline(data_load()):
+#         gentle_outputs.append([x['generated_text'] for x in out])
+#     queue2.put(gentle_outputs)
+
+# def process_1(origin_queue,df, hug_obj):
+#     # 최종 반환할 데이터 프레임
+#     result_df = pd.DataFrame(columns=['user', 'formal', 'gentle'])
+#     result_df['user'] = df['user']
+#     # KeyDataset을 활용하기 위한 변환
+#     queue1=mp.Queue()
+#     p1 = mp.Process(target=formal_change, args=(queue1, df, hug_obj))
+#     queue2=mp.Queue()
+#     p2 = mp.Process(target=gentle_change, args=(queue2, df, hug_obj))
+#     p1.start()
+#     p2.start()
+#     formal_outputs=queue1.get()
+#     gentle_outputs=queue2.get()
+#     p1.join()
+#     p2.join()
+#     result_df['gentle'] = formal_outputs
+#     result_df['formal'] = gentle_outputs
+    
+#     origin_queue.put(result_df)
