@@ -7,6 +7,7 @@
 ![GIFMaker_me](https://github.com/9unu/Itsme_web/assets/124652096/12bd097f-5980-437e-a4bc-c88f3b6fa43b)
 
 ### 변환 후
+![GIFMaker_me (1)](https://github.com/9unu/Itsme_web/assets/124652096/e112ff67-1645-427b-8fdd-ddb69023952c)
 
 
 ## 백엔드 플로우 차트 (Django)
