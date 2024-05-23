@@ -1,3 +1,4 @@
 hugging_face/
 media/
 saved_model/
+itsme/.env

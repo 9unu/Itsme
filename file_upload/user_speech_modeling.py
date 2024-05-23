@@ -25,8 +25,8 @@ class TextStyleTransferDataset(Dataset):
 
     def __getitem__(self, index):
         row = self.df.iloc[index, :].dropna().sample(2)
-        text1 = row[0]
-        text2 = row[1]
+        text1 = row.iloc[0]
+        text2 = row.iloc[1]
         target_style = row.index[1]
         target_style_name = self.style_map[target_style]
 

@@ -10,8 +10,9 @@ import multiprocessing as mp
 import time
 from .user_speech_modeling import user_modeling
 from .hug import hugging, make_pipeline
-import pandas as pd
-base_url="http://127.0.0.1:8000"
+from django.conf import settings
+
+home_url="http://127.0.0.1:8000"
 
 # 정중체, 상냥체 모델로 학습데이터 생성
 def process_1(queue1, df, hug_obj):
@@ -129,8 +130,8 @@ import requests
 class kakaoView(View):
     def get(self, request):
         kakao_api = "http://kauth.kakao.com/oauth/authorize?response_type=code"
-        redirect_uri = f"{base_url}/file/kakao/callback"
-        client_id = "0a28205ab1a5a548bcd4153810261b76"
+        redirect_uri = f"{home_url}/file/kakao/callback"
+        client_id = settings.API_KEY
         
         return redirect(f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}")
     
@@ -139,8 +140,8 @@ class kakaoCallBackView(View):
     def get(self, request):
         data={
             "grant_type" : "authorization_code",
-            "client_id" : "0a28205ab1a5a548bcd4153810261b76",
-            "redirection_uri": f"{base_url}/file/kakao",
+            "client_id" : settings.API_KEY,
+            "redirection_uri": f"{home_url}/file/kakao",
             "code" : request.GET["code"]
         }
         kakao_token_api="https://kauth.kakao.com/oauth/token"
