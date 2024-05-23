@@ -2,7 +2,7 @@
 : 스마트워치에서의 무뚝뚝한 답장 대신, 사용자의 대화 상대별 말투를 학습하여, 답장을 제안하는 프로젝트
 ## 데모 영상
 ### 웹페이지 화면
-![장고](https://github.com/9unu/Itsme_web/assets/124652096/423f82f1-f2b8-4b46-9521-84965887d987)
+![GIFMaker_me (3)](https://github.com/9unu/Itsme_web/assets/124652096/20fd0810-1175-4e58-a99f-33e67d311821)
 
 ### 변환 전
 ![변환전](https://github.com/9unu/Itsme_web/assets/124652096/6b83f28a-bcf0-4913-8db8-78b33a24ed00)
