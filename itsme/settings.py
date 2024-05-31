@@ -15,7 +15,7 @@ API_KEY=env("API_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['http://54.79.101.135/', '.ap-southeast-2.compute.amazonaws.com']
+ALLOWED_HOSTS = ['54.79.101.135', '.ap-southeast-2.compute.amazonaws.com']
 
 
 # Application definition
