@@ -146,7 +146,7 @@ class kakaoCallBackView(View):
         }
         kakao_token_api="https://kauth.kakao.com/oauth/token"
         access_token = requests.post(kakao_token_api, data=data).json()["access_token"]
-        
+        print("post까지 감")
         kakao_user_api="https://kapi.kakao.com/v2/user/me"
         header = {"Authorization":f"Bearer ${access_token}"}
         user_information = requests.get(kakao_user_api, headers=header).json()
