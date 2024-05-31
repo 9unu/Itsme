@@ -132,7 +132,7 @@ class kakaoView(View):
         kakao_api = "http://kauth.kakao.com/oauth/authorize?response_type=code"
         redirect_uri = f"{home_url}/file/kakao/callback"
         client_id = settings.API_KEY
-        
+        print("서버에 인증 요청은감")
         return redirect(f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}")
     
 """인증 요청 후 받은 엑세스토큰으로 사용자 정보 get request -> nickname, id 수집"""
@@ -157,6 +157,7 @@ class kakaoCallBackView(View):
         kakao_nickname = user_information["properties"]["nickname"]
         request.session['user_id']=kakao_id
         request.session['user_name']=kakao_nickname
+        print("받아옴")
         return render(request, 'file_upload/index.html')
         
 
