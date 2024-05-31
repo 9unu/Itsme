@@ -150,7 +150,7 @@ class kakaoCallBackView(View):
         kakao_user_api="https://kapi.kakao.com/v2/user/me"
         header = {"Authorization":f"Bearer ${access_token}"}
         user_information = requests.get(kakao_user_api, headers=header).json()
-        
+        print("request까지 감")
         kakao_id=user_information["id"]
         # kakao_email=user_information["kakao_account"]["email"]
         # profile_image_url=user_information["properties"]["profile_image"]
