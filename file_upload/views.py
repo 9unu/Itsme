@@ -116,6 +116,10 @@ def upload(request):
 
             instance.reply_list = result
             instance.save()
+            media_root = str(settings.MEDIA_ROOT)  # Path 객체를 문자열로 변환
+            remove_file = os.path.join(media_root, str(file.file))
+            os.remove(remove_file)
+            
             print("총 소요 시간: ", total_time//60 ,"분")
             return redirect(reverse('file_upload:index'))
     else:
