@@ -13,7 +13,7 @@ from .hug import hugging, make_pipeline
 from django.conf import settings
 import pandas as pd
 
-home_url="http://127.0.0.1:8000"
+home_url="http://54.79.101.135:8080/"
 
 # 정중체, 상냥체 모델로 학습데이터 생성
 def process_1(queue1, df, hug_obj):
