@@ -60,7 +60,9 @@ def upload(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             total_time=0
+            print("모델 초기화 시작")
             hug_obj = hugging()
+            print("모델 초기화 완료")
             # mp.set_start_method('spawn')
             instance = form.save(commit=False)
             instance.user_name=request.session['user_name']
