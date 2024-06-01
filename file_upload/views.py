@@ -13,7 +13,7 @@ from .hug import hugging, make_pipeline
 from django.conf import settings
 import pandas as pd
 
-home_url="54.79.101.135:8080"
+home_url="http://127.0.0.1:8000"#"54.79.101.135:8080"
 
 # 정중체, 상냥체 모델로 학습데이터 생성
 def process_1(queue1, df, hug_obj):
@@ -116,10 +116,18 @@ def upload(request):
 
             instance.reply_list = result
             instance.save()
-            media_root = str(settings.MEDIA_ROOT)  # Path 객체를 문자열로 변환
-            remove_file = os.path.join(media_root, str(file.file))
-            os.remove(remove_file)
-            
+
+            """메모리 상 텍스트파일도 삭제하는 방향으로 우선 진행"""
+            ExistingInstance = UploadFile.objects.filter(user_id=instance.user_id, room=instance.room)
+            if ExistingInstance.exists():
+                for file in ExistingInstance:
+                    media_root = str(settings.MEDIA_ROOT)  # Path 객체를 문자열로 변환
+                    remove_file = os.path.join(media_root, str(file.file))
+                    # 파일이 존재하면 삭제
+                    if os.path.isfile(remove_file):
+                        os.remove(remove_file)  # 실제 파일 삭제                    
+                    file.delete()           
+
             print("총 소요 시간: ", total_time//60 ,"분")
             return redirect(reverse('file_upload:index'))
     else:
@@ -142,6 +150,7 @@ class kakaoView(View):
 """인증 요청 후 받은 엑세스토큰으로 사용자 정보 get request -> nickname, id 수집"""
 class kakaoCallBackView(View):
     def get(self, request):
+        
         data={
             "grant_type" : "authorization_code",
             "client_id" : settings.API_KEY,
