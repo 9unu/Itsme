@@ -14,12 +14,9 @@ class hugging():
         gentle_model_path='9unu/gentle_speech_translation'
     
         self.origin_model = T5ForConditionalGeneration.from_pretrained(origin_model_path, cache_dir=cache_dir)
-        print("원본 모델 호출")
         self.tokenizer = T5TokenizerFast.from_pretrained(formal_model_path, cache_dir=cache_dir)
         self.formal_model = T5ForConditionalGeneration.from_pretrained(formal_model_path, cache_dir=cache_dir)
-        print("상냥체 모델 호출")
         self.gentle_model = T5ForConditionalGeneration.from_pretrained(gentle_model_path, cache_dir=cache_dir)
-        print("정중체 모델 호출")
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
 # 파이프라인 실행 -> 변환 문장 return
