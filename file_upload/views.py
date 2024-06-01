@@ -167,6 +167,8 @@ class KakaoCallBackView(View):
                 request.session['user_name'] = kakao_nickname
                 print("받아옴")
                 return render(request, 'file_upload/index.html')
+            else:
+                print("오류")
 
         
 
