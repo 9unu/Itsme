@@ -131,7 +131,7 @@ def upload(request):
 from django.views import View
 import requests
 """카카오 서버에 인증 요청"""
-class KakaoView(View):
+class kakaoView(View):
     def get(self, request):
         kakao_api = "https://kauth.kakao.com/oauth/authorize?response_type=code"
         redirect_uri = f"{home_url}/file/kakao/callback"
@@ -140,7 +140,7 @@ class KakaoView(View):
         return redirect(f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}")
     
 """인증 요청 후 받은 엑세스토큰으로 사용자 정보 get request -> nickname, id 수집"""
-class KakaoCallBackView(View):
+class kakaoCallBackView(View):
     def get(self, request):
         data = {
             "grant_type": "authorization_code",
