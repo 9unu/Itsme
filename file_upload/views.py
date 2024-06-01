@@ -131,38 +131,43 @@ def upload(request):
 from django.views import View
 import requests
 """카카오 서버에 인증 요청"""
-class kakaoView(View):
+class KakaoView(View):
     def get(self, request):
-        kakao_api = "http://kauth.kakao.com/oauth/authorize?response_type=code"
+        kakao_api = "https://kauth.kakao.com/oauth/authorize?response_type=code"
         redirect_uri = f"{home_url}/file/kakao/callback"
         client_id = settings.API_KEY
         print("서버에 인증 요청은감")
         return redirect(f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}")
     
 """인증 요청 후 받은 엑세스토큰으로 사용자 정보 get request -> nickname, id 수집"""
-class kakaoCallBackView(View):
+class KakaoCallBackView(View):
     def get(self, request):
-        data={
-            "grant_type" : "authorization_code",
-            "client_id" : settings.API_KEY,
-            "redirection_uri": f"{home_url}/file/kakao",
-            "code" : request.GET["code"]
+        data = {
+            "grant_type": "authorization_code",
+            "client_id": settings.API_KEY,
+            "redirect_uri": f"{home_url}/file/kakao/callback",  # 변경: redirection_uri -> redirect_uri
+            "code": request.GET["code"]
         }
-        kakao_token_api="https://kauth.kakao.com/oauth/token"
-        access_token = requests.post(kakao_token_api, data=data).json()["access_token"]
-        print("post까지 감")
-        kakao_user_api="https://kapi.kakao.com/v2/user/me"
-        header = {"Authorization":f"Bearer ${access_token}"}
-        user_information = requests.get(kakao_user_api, headers=header).json()
-        print("request까지 감")
-        kakao_id=user_information["id"]
-        # kakao_email=user_information["kakao_account"]["email"]
-        # profile_image_url=user_information["properties"]["profile_image"]
-        kakao_nickname = user_information["properties"]["nickname"]
-        request.session['user_id']=kakao_id
-        request.session['user_name']=kakao_nickname
-        print("받아옴")
-        return render(request, 'file_upload/index.html')
+        kakao_token_api = "https://kauth.kakao.com/oauth/token"
+        response = requests.post(kakao_token_api, data=data)
+        response_data = response.json()
+        access_token = response_data.get("access_token")
+
+        if access_token:
+            kakao_user_api = "https://kapi.kakao.com/v2/user/me"
+            headers = {"Authorization": f"Bearer {access_token}"}  # 변경: ${access_token} -> {access_token}
+            user_response = requests.get(kakao_user_api, headers=headers)
+            user_information = user_response.json()
+
+            kakao_id = user_information.get("id")
+            kakao_nickname = user_information.get("properties", {}).get("nickname")
+
+            if kakao_id and kakao_nickname:
+                request.session['user_id'] = kakao_id
+                request.session['user_name'] = kakao_nickname
+                print("받아옴")
+                return render(request, 'file_upload/index.html')
+
         
 
 """로그인 화면"""
