@@ -117,17 +117,17 @@ def upload(request):
             instance.reply_list = result
             instance.save()
 
-            """메모리 상 텍스트파일도 삭제하는 방향으로 우선 진행"""
+            """용량 문제로 텍스트파일은 삭제하는 방향으로 우선 진행"""
             ExistingInstance = UploadFile.objects.filter(user_id=instance.user_id, room=instance.room)
             if ExistingInstance.exists():
                 for file in ExistingInstance:
-                    media_root = str(settings.MEDIA_ROOT)  # Path 객체를 문자열로 변환
+                    media_root = str(settings.MEDIA_ROOT)
                     remove_file = os.path.join(media_root, str(file.file))
+                    print(remove_file)
                     # 파일이 존재하면 삭제
                     if os.path.isfile(remove_file):
                         os.remove(remove_file)  # 실제 파일 삭제                    
-                    file.delete()           
-
+       
             print("총 소요 시간: ", total_time//60 ,"분")
             return redirect(reverse('file_upload:index'))
     else:
